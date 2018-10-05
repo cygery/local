@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Socket.IO chat</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        form {
+            background: #333;
+            padding: 4px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #messages li {
+            padding: 4px 8px;
+        }
+
+        #messages li:nth-child(odd) {
+            background: #eee;
+        }
+    </style>
+</head>
+
+<body>
+    <ul id="messages"></ul>
+    <form action="">
+        <div class="input-group">
+            <input id="m" type="text" class="form-control" autocomplete="off" placeholder="Type here..." />
+            <div class="input-group-append">
+                <button class="btn btn-success">Send</button>
+            </div>
+        </div>
+    </form>
+    <div class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Pick your username</h5>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <input id="input-username" type="text" class="form-control" placeholder="Username" aria-label="Username">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="button-save" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        $(function() {
+            var id = null;
+
+            $('.modal').modal('show');
+            $('#button-save').click(function() {
+                $('.modal').modal('hide');
+                id = $('#input-username').val();
+            });
+
+            var socket = io();
+            $('form').submit(function() {
+                socket.emit('chat message', id, $('#m').val());
+                $('#m').val('');
+                return false;
+            });
+            socket.on('chat message', function(from, msg) {
+                var el = $('<li>').html('<b>From:</b> ' + from + '<br/>' + msg);
+                if (from === id) {
+                    el.css('text-align', 'right');
+                }
+                $('#messages').append(el);
+            });
+        });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</body>
+
+</html>
